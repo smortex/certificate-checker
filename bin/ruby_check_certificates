@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby
+
+require 'ruby_check_certificates'
+require 'optparse'
+
+options = {
+  :from => "#{`/usr/bin/id -nu`.chomp}@#{`/bin/hostname -f`.chomp}"
+}
+
+OptionParser.new do |opts|
+  opts.banner = 'usage: ruby-check-certificates [options] path...'
+  opts.separator ''
+  opts.separator 'Common options:'
+  opts.on '-v', '--[no-]verbose', 'Run verbosely' do |v|
+    options[:verbose] = v
+  end
+  opts.separator ''
+  opts.separator 'E-mail reporting options:'
+  opts.on '-f', '--from=ADDRESS', 'Send result from ADDRESS' do |from|
+    options[:from] = from
+  end
+  opts.on '-t', '--to=ADDRESS', 'Send result to ADDRESS' do |to|
+    options[:to] = to
+  end
+end.parse!
+
+include RubyCheckCertificates
+
+report = CertificateReport.new
+
+ARGV.each do |arg|
+  finder = CertificateFinder.new
+  finder.certificates(arg).each do |file|
+    parser = CertificateParser.new(file)
+    parser.certificates.each do |line, cert|
+      report.check_certificate(file, line, cert)
+    end
+  end
+end
+
+if report.has_errors? || options[:verbose] then
+  if options[:to] then
+    require 'net/smtp'
+    Net::SMTP.start('localhost', 25, `/bin/hostname -f`.chomp) do |smtp|
+      message = <<EOT
+From: #{options[:from]}
+To: #{options[:to]}
+Subject: #{report.error_count} certificate#{'s' if report.error_count != 1} are about to expire
+Date: #{Time.now.strftime '%a, %d %b %Y %T %z'}
+Message-Id: <unique.message.id.string@example.com>
+
+#{report.to_s}
+EOT
+      smtp.send_message(message, options[:from], options[:to])
+    end
+  else
+    puts report.to_s
+  end
+end
