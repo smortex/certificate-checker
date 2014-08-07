@@ -41,13 +41,15 @@ end
 if report.has_errors? || options[:verbose] then
   if options[:to] then
     require 'net/smtp'
-    Net::SMTP.start('localhost', 25, `/bin/hostname -f`.chomp) do |smtp|
+    hostname = `/bin/hostname -f`.chomp
+    now = Time.now
+    Net::SMTP.start('localhost', 25, hostname) do |smtp|
       message = <<EOT
 From: #{options[:from]}
 To: #{options[:to]}
-Subject: #{report.error_count} certificate#{'s' if report.error_count != 1} are about to expire
-Date: #{Time.now.strftime '%a, %d %b %Y %T %z'}
-Message-Id: <unique.message.id.string@example.com>
+Subject: [ruby-check-certificates] #{report.error_count} certificate#{'s' if report.error_count != 1} are about to expire
+Date: #{now.strftime('%a, %d %b %Y %T %z')}
+Message-Id: <ruby-check-certificates-#{now.strftime('%s')}@#{hostname}>
 
 #{report.to_s}
 EOT
