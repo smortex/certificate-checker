@@ -1,8 +1,8 @@
 module RubyCheckCertificates
   class CertificateExpirationInfo
-    attr_reader :file, :line, :subject, :not_after
-    def initialize(file, line, subject, not_after)
-      @file, @line, @subject, @not_after = file, line, subject, not_after
+    attr_reader :file, :line, :certificate
+    def initialize(file, line, certificate)
+      @file, @line, @certificate = file, line, certificate
     end
   end
 end
