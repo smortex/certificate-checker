@@ -4,18 +4,28 @@ module RubyCheckCertificates
       @config = config.merge(ext: ['*.pem', '*.crt'])
     end
 
-    def certificates(path)
-      res = []
+    def search(path)
       if File.directory?(path)
-        @config[:ext].each do |ext|
-          res << Dir.glob(File.join(path, '**', ext))
-        end
+        search_directory(path)
       elsif File.exist?(path)
-        res << path
+        search_file(path)
       else
         raise "No such file or directory: #{path}"
       end
+    end
+
+    private
+
+    def search_directory(path)
+      res = []
+      @config[:ext].each do |ext|
+        res << Dir.glob(File.join(path, '**', ext))
+      end
       res.flatten
+    end
+
+    def search_file(path)
+      [path]
     end
   end
 end

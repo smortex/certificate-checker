@@ -29,12 +29,16 @@ include RubyCheckCertificates
 report = CertificateReport.new
 
 ARGV.each do |arg|
-  finder = CertificateFinder.new
-  finder.certificates(arg).each do |file|
-    parser = CertificateParser.new(file)
-    parser.certificates.each do |line, cert|
-      report.check_certificate(file, line, cert)
+  begin
+    finder = CertificateFinder.new
+    finder.search(arg).each do |file|
+      parser = CertificateParser.new(file)
+      parser.certificates.each do |line, cert|
+        report.check_certificate(file, line, cert)
+      end
     end
+  rescue StandardError => e
+    $stderr.puts e.message
   end
 end
 
