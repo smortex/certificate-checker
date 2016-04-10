@@ -14,7 +14,7 @@ module RubyCheckCertificates
     end
 
     def not_after
-      days = ((@certificate.not_after - Time.now.utc) / (2600 * 24))
+      days = ((@certificate.not_after - Time.now.utc) / (24 * 60 * 60))
       format_string = days < 0 ? '%s (%d %s ago)' : '%s (%d %s left)'
       days = days.truncate
       format(format_string, @certificate.not_after, days.abs, 'day'.pluralize(days.abs))

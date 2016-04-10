@@ -28,6 +28,14 @@ module RubyCheckCertificates
       end
       let(:date) { Time.now.utc }
 
+      context 'a few days ago' do
+        let(:expiration_date) { date - 27 * 24 * 60 * 60 }
+
+        it 'reports correct expiration information' do
+          expect(subject.not_after).to eq("#{expiration_date} (27 days ago)")
+        end
+      end
+
       context 'yesterday' do
         let(:expiration_date) { date - 24 * 60 * 60 }
 
@@ -36,7 +44,7 @@ module RubyCheckCertificates
         end
       end
 
-      context 'a few minutes ago' do
+      context 'one hour minutes ago' do
         let(:expiration_date) { date - 60 * 60 }
 
         it 'reports correct expiration information' do
@@ -44,7 +52,7 @@ module RubyCheckCertificates
         end
       end
 
-      context 'in a few minutes' do
+      context 'in one hour' do
         let(:expiration_date) { date + 60 * 60 }
 
         it 'reports correct expiration information' do
@@ -56,7 +64,15 @@ module RubyCheckCertificates
         let(:expiration_date) { date + 24 * 60 * 60 }
 
         it 'reports correct expiration information' do
-          expect(subject.not_after).to eq("#{expiration_date} (1 day left)")
+          expect(subject.not_after).to eq("#{expiration_date} (0 days left)")
+        end
+      end
+
+      context 'in a few days' do
+        let(:expiration_date) { date + 27 * 24 * 60 * 60 }
+
+        it 'reports correct expiration information' do
+          expect(subject.not_after).to eq("#{expiration_date} (26 days left)")
         end
       end
     end
