@@ -1,4 +1,8 @@
-require 'erb'
+require 'active_support'
+require 'active_support/duration'
+require 'active_support/core_ext/date/calculations'
+require 'active_support/core_ext/numeric'
+require 'active_support/core_ext/integer/time'
 
 module RubyCheckCertificates
   class CertificateReport
@@ -22,72 +26,53 @@ module RubyCheckCertificates
       @certificates.count
     end
 
+    def summary
+      "#{error_count} problem#{'s' if error_count != 1} found in #{@checked_certificates} certificate#{'s' if @checked_certificates != 1}\n\n"
+    end
+
+    def certificate_group(label, crts)
+      res = "#{sprintf(label, crts.count, crts.count != 1 ? 's' : '')}:\n"
+      crts.each do |crt|
+        res += "#{certificate_details(crt)}\n"
+      end
+      res
+    end
+
     def certificate_details(crt)
-      erb = ERB.new <<EOT, nil, '<>'
-  * <%= crt.file %>:<%= crt.line %>
-    subject:   <%= crt.certificate.subject %>
-    not_after: <%= crt.certificate.not_after %> (<%= n = ((Time.now.utc - crt.certificate.not_after) / (2600 * 24)).ceil %> day<%= 's' if n != 1 %> ago)
-<% crt.certificate.extensions.each do |ext| %>
-    <%= ext.oid %>: <%= ext.value.chomp.gsub("\n", "\n" + ' ' * (4 + ext.oid.length + 2)) %>
-<% end %>
+      res = <<EOT
+  * #{crt.file}:#{crt.line}
+    subject:   #{crt.certificate.subject}
+    not_after: #{crt.certificate.not_after} (#{n = ((Time.now.utc - crt.certificate.not_after) / (2600 * 24)).ceil} day#{ 's' if n != 1} ago)
 EOT
-      erb.result(binding)
+      crt.certificate.extensions.each do |ext|
+        res += "    #{ext.oid}: #{ext.value.chomp.gsub(/\n\s*/, "\n" + ' ' * (4 + ext.oid.length + 2))}\n"
+      end
+      res
     end
 
     def to_s
-      stop = Time.now.utc
+      now = Time.now.utc
+
+      stop_offsets = {
+        '%d expired certificate%s' => now,
+        '%d certificate%s expiring in less than 1 week'   => now + 1.week,
+        '%d certificate%s expiring in less than 2 weeks'  => now + 2.weeks,
+        '%d certificate%s expiring in less than 1 month'  => now + 1.month,
+        '%d certificate%s expiring in less than 2 months' => now + 2.months
+      }
+
+      last_stop = nil
 
       @certificates.sort! { |a, b| a.certificate.not_after <=> b.certificate.not_after }
-
-      @expired = @certificates.select { |x| x.certificate.not_after <= stop }
-      @one_week = @certificates.select { |x| x.certificate.not_after > stop && x.certificate.not_after <= stop + 3600 * 24 * 7 }
-      @two_week = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 7 && x.certificate.not_after <= stop + 3600 * 24 * 7 * 2 }
-      @one_month = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 7 * 2 && x.certificate.not_after <= stop + 3600 * 24 * 30 }
-      @two_month = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 30 && x.certificate.not_after <= stop + 3600 * 24 * 30 * 2 }
-      erb = ERB.new <<EOT, nil, '<>'
-<%= @certificates.count %> problem<%= 's' if @certificates.count != 1 %> found in <%= @checked_certificates %> certificate<%= 's' if @checked_certificates != 1 %>.
-<% if @expired.count > 0 then %>
-
-<%= @expired.count %> expired certificate<%= 's' if @expired.count != 1 %>:
-<% @expired.each do |crt| %>
-<%= certificate_details(crt) %>
-
-<% end %>
-<% end %>
-<% if @one_week.count > 0 then %>
-
-<%= @one_week.count %> certificate<%= 's' if @one_week.count != 1 %> expiring in less than 1 week:
-<% @one_week.each do |crt| %>
-<%= certificate_details(crt) %>
-
-<% end %>
-<% end %>
-<% if @two_week.count > 0 then %>
-
-<%= @two_week.count %> certificate<%= 's' if @two_week.count != 1 %> expiring in less than 2 weeks:
-<% @two_week.each do |crt| %>
-<%= certificate_details(crt) %>
-
-<% end %>
-<% end %>
-<% if @one_month.count > 0 then %>
-
-<%= @one_month.count %> certificate<%= 's' if @one_month.count != 1 %> expiring in less than 1 month:
-<% @one_month.each do |crt| %>
-<%= certificate_details(crt) %>
-
-<% end %>
-<% end %>
-<% if @two_month.count > 0 then %>
-
-<%= @two_month.count %> certificate<%= 's' if @two_month.count != 1 %> expiring in less than 2 months:
-<% @two_month.each do |crt| %>
-<%= certificate_details(crt) %>
-
-<% end %>
-<% end %>
-EOT
-      erb.result(binding)
+      res = summary
+      stop_offsets.each do |label, stop|
+        crts = @certificates.select { |x| (last_stop.nil? || x.certificate.not_after > last_stop) && x.certificate.not_after <= stop }
+        if crts.count > 0
+          res += certificate_group(label, crts)
+        end
+        last_stop = stop
+      end
+      res
     end
   end
 end
