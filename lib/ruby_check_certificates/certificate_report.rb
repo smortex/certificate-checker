@@ -24,7 +24,7 @@ module RubyCheckCertificates
 
     def check_certificate(file, line, certificate)
       @checked_certificates += 1
-      if certificate.not_after + 3600 * 24 * 30 * 2 < Time.now.utc
+      if certificate.not_after < @stop_offsets.values.last
         @certificates << CertificateExpirationInfo.new(file, line, certificate)
       end
     end
