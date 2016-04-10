@@ -44,7 +44,7 @@ module RubyCheckCertificates
         end
       end
 
-      context 'one hour minutes ago' do
+      context 'one hour ago' do
         let(:expiration_date) { date - 60 * 60 }
 
         it 'reports correct expiration information' do
