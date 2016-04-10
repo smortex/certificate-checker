@@ -9,7 +9,7 @@ module RubyCheckCertificates
       @certificates = {}
       @lineno = 0
 
-      @f = File.open(filename)
+      @f = File.open(@filename, 'rb')
       begin
         read_random_data
       ensure
@@ -23,7 +23,7 @@ module RubyCheckCertificates
       until @f.eof?
         line = @f.readline
         @lineno += 1
-        next unless line == "-----BEGIN CERTIFICATE-----\n"
+        next unless line =~ /^-----BEGIN CERTIFICATE-----/
         @data_start_lineno = @lineno
         @data = line
         read_certificate
@@ -35,13 +35,13 @@ module RubyCheckCertificates
         line = @f.readline
         @lineno += 1
         @data += line
-        if line == "-----END CERTIFICATE-----\n"
+        if line =~ /^-----END CERTIFICATE-----/
           add_certificate
           return
         end
       end
 
-      raise 'Unexpected end of file'
+      raise "#{@filename}:#{@lineno}: Unexpected end of file"
     end
 
     def add_certificate
