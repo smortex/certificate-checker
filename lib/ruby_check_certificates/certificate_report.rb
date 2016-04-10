@@ -3,12 +3,23 @@ require 'active_support/duration'
 require 'active_support/core_ext/date/calculations'
 require 'active_support/core_ext/numeric'
 require 'active_support/core_ext/integer/time'
+require 'active_support/core_ext/string/inflections'
 
 module RubyCheckCertificates
   class CertificateReport
     def initialize
       @certificates = []
       @checked_certificates = 0
+
+      @now = Time.now.utc
+
+      @stop_offsets = {
+        '%d expired %s' => @now,
+        '%d %s expiring in less than 1 week'   => @now + 1.week,
+        '%d %s expiring in less than 2 weeks'  => @now + 2.weeks,
+        '%d %s expiring in less than 1 month'  => @now + 1.month,
+        '%d %s expiring in less than 2 months' => @now + 2.months
+      }
     end
 
     def check_certificate(file, line, certificate)
@@ -27,11 +38,11 @@ module RubyCheckCertificates
     end
 
     def summary
-      "#{error_count} problem#{'s' if error_count != 1} found in #{@checked_certificates} certificate#{'s' if @checked_certificates != 1}\n\n"
+      "#{error_count} #{'problem'.pluralize(error_count)} found in #{@checked_certificates} #{'certificate'.pluralize(@checked_certificates)}\n\n"
     end
 
     def certificate_group(label, crts)
-      res = "#{sprintf(label, crts.count, crts.count != 1 ? 's' : '')}:\n"
+      res = "#{format(label, crts.count, 'certificate'.pluralize(crts.count))}:\n"
       crts.each do |crt|
         res += "#{certificate_details(crt)}\n"
       end
@@ -41,35 +52,26 @@ module RubyCheckCertificates
     def certificate_details(crt)
       res = <<EOT
   * #{crt.file}:#{crt.line}
-    subject:   #{crt.certificate.subject}
-    not_after: #{crt.certificate.not_after} (#{n = ((Time.now.utc - crt.certificate.not_after) / (2600 * 24)).ceil} day#{ 's' if n != 1} ago)
+    subject:   #{crt.subject}
+    not_after: #{crt.not_after}
 EOT
-      crt.certificate.extensions.each do |ext|
-        res += "    #{ext.oid}: #{ext.value.chomp.gsub(/\n\s*/, "\n" + ' ' * (4 + ext.oid.length + 2))}\n"
+      crt.each_extension do |oid, value|
+        res += format_extension(oid, value)
       end
       res
     end
 
+    def format_extension(oid, value)
+      "    #{oid}: #{value.chomp.gsub(/\n\s*/, "\n" + ' ' * (4 + oid.length + 2))}\n"
+    end
+
     def to_s
-      now = Time.now.utc
-
-      stop_offsets = {
-        '%d expired certificate%s' => now,
-        '%d certificate%s expiring in less than 1 week'   => now + 1.week,
-        '%d certificate%s expiring in less than 2 weeks'  => now + 2.weeks,
-        '%d certificate%s expiring in less than 1 month'  => now + 1.month,
-        '%d certificate%s expiring in less than 2 months' => now + 2.months
-      }
-
       last_stop = nil
 
-      @certificates.sort! { |a, b| a.certificate.not_after <=> b.certificate.not_after }
       res = summary
-      stop_offsets.each do |label, stop|
-        crts = @certificates.select { |x| (last_stop.nil? || x.certificate.not_after > last_stop) && x.certificate.not_after <= stop }
-        if crts.count > 0
-          res += certificate_group(label, crts)
-        end
+      @stop_offsets.each do |label, stop|
+        crts = @certificates.select { |x| x.expired_between?(last_stop, stop) }
+        res += certificate_group(label, crts) if crts.count > 0
         last_stop = stop
       end
       res
