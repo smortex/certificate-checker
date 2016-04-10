@@ -6,8 +6,14 @@ module RubyCheckCertificates
 
     def certificates(path)
       res = []
-      @config[:ext].each do |ext|
-        res << Dir.glob(File.join(path, '**', ext))
+      if File.directory?(path)
+        @config[:ext].each do |ext|
+          res << Dir.glob(File.join(path, '**', ext))
+        end
+      elsif File.exist?(path)
+        res << path
+      else
+        raise "No such file or directory: #{path}"
       end
       res.flatten
     end
