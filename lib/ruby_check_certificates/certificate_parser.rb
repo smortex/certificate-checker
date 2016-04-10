@@ -27,7 +27,7 @@ module RubyCheckCertificates
         end
       end
 
-      fail 'Unexpected end of file' if reading
+      raise 'Unexpected end of file' if reading
     end
   end
 end
