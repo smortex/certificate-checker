@@ -1,5 +1,8 @@
 # RubyCheckCertificates
 
+[![Build Status](https://travis-ci.org/smortex/ruby_check_certificates.svg?branch=master)](https://travis-ci.org/smortex/ruby_check_certificates)
+[![Code Climate](https://codeclimate.com/github/smortex/ruby_check_certificates/badges/gpa.svg)](https://codeclimate.com/github/smortex/ruby_check_certificates)
+
 Find certificates in a directory tree and report any expired or about to expire certificate.
 
 ## Installation
