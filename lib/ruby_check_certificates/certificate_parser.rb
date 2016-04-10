@@ -5,6 +5,7 @@ module RubyCheckCertificates
     attr_reader :certificates
 
     def initialize(filename)
+      @filename = filename
       @certificates = {}
       @lineno = 0
 
@@ -35,12 +36,18 @@ module RubyCheckCertificates
         @lineno += 1
         @data += line
         if line == "-----END CERTIFICATE-----\n"
-          certificates[@data_start_lineno] = OpenSSL::X509::Certificate.new(@data)
+          add_certificate
           return
         end
       end
 
       raise 'Unexpected end of file'
+    end
+
+    def add_certificate
+      certificates[@data_start_lineno] = OpenSSL::X509::Certificate.new(@data)
+    rescue OpenSSL::X509::CertificateError => e
+      $stderr.puts "Error parsing certificate at #{@filename}:#{@data_start_lineno}: #{e.message}"
     end
   end
 end
