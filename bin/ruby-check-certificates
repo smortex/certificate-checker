@@ -37,7 +37,7 @@ ARGV.each do |arg|
         report.check_certificate(file, line, cert)
       end
     end
-  rescue StandardError => e
+  rescue Errno::EACCES => e
     $stderr.puts e.message
   end
 end
