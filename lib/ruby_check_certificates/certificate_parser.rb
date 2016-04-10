@@ -6,28 +6,41 @@ module RubyCheckCertificates
 
     def initialize(filename)
       @certificates = {}
+      @lineno = 0
 
-      lineno = 0
-      reading = false
-      data = nil
-      data_start_lineno = nil
-      File.readlines(filename).each do |line|
-        lineno += 1
+      @f = File.open(filename)
+      begin
+        read_random_data
+      ensure
+        @f.close
+      end
+    end
 
-        if !reading && line == "-----BEGIN CERTIFICATE-----\n"
-          data = line
-          data_start_lineno = lineno
-          reading = true
-        elsif reading && line == "-----END CERTIFICATE-----\n"
-          data += line
-          @certificates[data_start_lineno] = OpenSSL::X509::Certificate.new(data)
-          reading = false
-        elsif reading
-          data += line
+    private
+
+    def read_random_data
+      until @f.eof?
+        line = @f.readline
+        @lineno += 1
+        next unless line == "-----BEGIN CERTIFICATE-----\n"
+        @data_start_lineno = @lineno
+        @data = line
+        read_certificate
+      end
+    end
+
+    def read_certificate
+      until @f.eof?
+        line = @f.readline
+        @lineno += 1
+        @data += line
+        if line == "-----END CERTIFICATE-----\n"
+          certificates[@data_start_lineno] = OpenSSL::X509::Certificate.new(@data)
+          return
         end
       end
 
-      raise 'Unexpected end of file' if reading
+      raise 'Unexpected end of file'
     end
   end
 end
