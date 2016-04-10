@@ -10,7 +10,7 @@ module RubyCheckCertificates
       elsif File.exist?(path)
         search_file(path)
       else
-        raise "No such file or directory: #{path}"
+        raise Errno::EACCES, "No such file or directory: #{path}"
       end
     end
 
