@@ -68,6 +68,8 @@ EOT
     def to_s
       last_stop = nil
 
+      @certificates.sort! { |a, b| a.certificate.not_after <=> b.certificate.not_after }
+
       res = summary
       @stop_offsets.each do |label, stop|
         crts = @certificates.select { |x| x.expired_between?(last_stop, stop) }
