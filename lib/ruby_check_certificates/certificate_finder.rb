@@ -1,9 +1,7 @@
 module RubyCheckCertificates
   class CertificateFinder
     def initialize(config = {})
-      @config = config.merge({
-        ext: ['*.pem', '*.crt'],
-      })
+      @config = config.merge(ext: ['*.pem', '*.crt'])
     end
 
     def certificates(path)

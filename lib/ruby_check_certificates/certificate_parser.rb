@@ -14,22 +14,20 @@ module RubyCheckCertificates
       File.readlines(filename).each do |line|
         lineno += 1
 
-        if !reading && line == "-----BEGIN CERTIFICATE-----\n" then
+        if !reading && line == "-----BEGIN CERTIFICATE-----\n"
           data = line
           data_start_lineno = lineno
           reading = true
-        elsif reading && line == "-----END CERTIFICATE-----\n" then
+        elsif reading && line == "-----END CERTIFICATE-----\n"
           data += line
           @certificates[data_start_lineno] = OpenSSL::X509::Certificate.new(data)
           reading = false
-        elsif reading then
+        elsif reading
           data += line
         end
       end
 
-      if reading then
-        raise "Unexpected end of file"
-      end
+      fail 'Unexpected end of file' if reading
     end
   end
 end

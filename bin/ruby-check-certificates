@@ -4,7 +4,7 @@ require 'ruby_check_certificates'
 require 'optparse'
 
 options = {
-  :from => "#{`/usr/bin/id -nu`.chomp}@#{`/bin/hostname -f`.chomp}"
+  from: "#{`/usr/bin/id -nu`.chomp}@#{`/bin/hostname -f`.chomp}"
 }
 
 OptionParser.new do |opts|
@@ -38,8 +38,8 @@ ARGV.each do |arg|
   end
 end
 
-if report.has_errors? || options[:verbose] then
-  if options[:to] then
+if report.errors? || options[:verbose]
+  if options[:to]
     require 'net/smtp'
     hostname = `/bin/hostname -f`.chomp
     now = Time.now
@@ -51,7 +51,7 @@ Subject: [ruby-check-certificates] #{report.error_count} certificate#{'s' if rep
 Date: #{now.strftime('%a, %d %b %Y %T %z')}
 Message-Id: <ruby-check-certificates-#{now.strftime('%s')}@#{hostname}>
 
-#{report.to_s}
+#{report}
 EOT
       smtp.send_message(message, options[:from], options[:to])
     end

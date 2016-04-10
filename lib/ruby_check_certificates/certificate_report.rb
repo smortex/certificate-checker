@@ -9,12 +9,12 @@ module RubyCheckCertificates
 
     def check_certificate(file, line, certificate)
       @checked_certificates += 1
-      if certificate.not_after + 3600*24*30*2 < Time.now.utc then
+      if certificate.not_after + 3600 * 24 * 30 * 2 < Time.now.utc
         @certificates << CertificateExpirationInfo.new(file, line, certificate)
       end
     end
 
-    def has_errors?
+    def errors?
       @certificates.count > 0
     end
 
@@ -25,13 +25,13 @@ module RubyCheckCertificates
     def to_s
       stop = Time.now.utc
 
-      @certificates.sort! { |a,b| a.certificate.not_after <=> b.certificate.not_after }
+      @certificates.sort! { |a, b| a.certificate.not_after <=> b.certificate.not_after }
 
       @expired = @certificates.select { |x| x.certificate.not_after <= stop }
-      @one_week = @certificates.select { |x| x.certificate.not_after > stop && x.certificate.not_after <= stop + 3600*24*7 }
-      @two_week = @certificates.select { |x| x.certificate.not_after > stop + 3600*24*7 && x.certificate.not_after <= stop + 3600*24*7*2 }
-      @one_month = @certificates.select { |x| x.certificate.not_after > stop + 3600*24*7*2 && x.certificate.not_after <= stop + 3600*24*30 }
-      @two_month = @certificates.select { |x| x.certificate.not_after > stop + 3600*24*30 && x.certificate.not_after <= stop + 3600*24*30*2 }
+      @one_week = @certificates.select { |x| x.certificate.not_after > stop && x.certificate.not_after <= stop + 3600 * 24 * 7 }
+      @two_week = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 7 && x.certificate.not_after <= stop + 3600 * 24 * 7 * 2 }
+      @one_month = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 7 * 2 && x.certificate.not_after <= stop + 3600 * 24 * 30 }
+      @two_month = @certificates.select { |x| x.certificate.not_after > stop + 3600 * 24 * 30 && x.certificate.not_after <= stop + 3600 * 24 * 30 * 2 }
       erb = ERB.new <<EOT, nil, '<>'
 <%= @certificates.count %> problem<%= 's' if @certificates.count != 1 %> found in <%= @checked_certificates %> certificate<%= 's' if @checked_certificates != 1 %>.
 <% if @expired.count > 0 then %>
