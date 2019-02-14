@@ -3,6 +3,17 @@ require 'spec_helper'
 RSpec.describe RubyCheckCertificates::CertificateExpirationInfo do
   subject { RubyCheckCertificates::CertificateExpirationInfo.new('not-on-disk.crt', 1, certificate) }
 
+  context '#subject' do
+    let(:certificate) do
+      certificate = OpenSSL::X509::Certificate.new
+      certificate.subject = OpenSSL::X509::Name.parse('CN=example.com')
+      certificate
+    end
+    it "returns the certificate's subject" do
+      expect(subject.subject).to eq('/CN=example.com')
+    end
+  end
+
   context '#expired_between?' do
     let(:certificate) do
       certificate = OpenSSL::X509::Certificate.new
@@ -74,5 +85,19 @@ RSpec.describe RubyCheckCertificates::CertificateExpirationInfo do
         expect(subject.not_after).to eq("#{expiration_date} (26 days left)")
       end
     end
+  end
+
+  context '#each_extension' do
+    let(:certificate) do
+      certificate = OpenSSL::X509::Certificate.new
+      ef = OpenSSL::X509::ExtensionFactory.new
+      ef.subject_certificate = certificate
+      ef.issuer_certificate = certificate
+      certificate.add_extension(ef.create_extension('basicConstraints', 'CA:TRUE', true))
+      certificate.add_extension(ef.create_extension('keyUsage', 'Certificate Sign, CRL Sign', true))
+      certificate
+    end
+
+    specify { expect { |b| subject.each_extension(&b) }.to yield_successive_args(['basicConstraints', 'CA:TRUE'], ['keyUsage', 'Certificate Sign, CRL Sign']) }
   end
 end

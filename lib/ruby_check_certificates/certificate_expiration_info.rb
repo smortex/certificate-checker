@@ -10,7 +10,7 @@ module RubyCheckCertificates
     end
 
     def subject
-      @certificate.subject
+      @certificate.subject.to_s
     end
 
     def not_after
