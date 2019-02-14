@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe RubyCheckCertificates::CertificateParser do
+RSpec.describe RubyCheckCertificates::CertificateParser do
   it 'parses files containing multiple certificates' do
     s = RubyCheckCertificates::CertificateParser.new(File.expand_path('../certificates/cacert.org.crt', __FILE__))
     expect(s.certificates.count).to eq(2)
