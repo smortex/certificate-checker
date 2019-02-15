@@ -1,6 +1,6 @@
 require 'active_support/core_ext/string/inflections'
 
-module RubyCheckCertificates
+module CertificateChecker
   class CertificateExpirationInfo
     attr_reader :file, :line, :certificate
     def initialize(file, line, certificate)

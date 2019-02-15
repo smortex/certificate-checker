@@ -1,6 +1,6 @@
 require 'openssl'
 
-module RubyCheckCertificates
+module CertificateChecker
   class CertificateParser
     attr_reader :certificates
 

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-RSpec.describe RubyCheckCertificates::CertificateExpirationInfo do
-  subject { RubyCheckCertificates::CertificateExpirationInfo.new('not-on-disk.crt', 1, certificate) }
+RSpec.describe CertificateChecker::CertificateExpirationInfo do
+  subject { CertificateChecker::CertificateExpirationInfo.new('not-on-disk.crt', 1, certificate) }
 
   context '#subject' do
     let(:certificate) do

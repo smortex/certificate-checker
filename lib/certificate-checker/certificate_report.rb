@@ -5,7 +5,7 @@ require 'active_support/core_ext/numeric'
 require 'active_support/core_ext/integer/time'
 require 'active_support/core_ext/string/inflections'
 
-module RubyCheckCertificates
+module CertificateChecker
   class CertificateReport
     def initialize
       @certificates = []

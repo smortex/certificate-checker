@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'ruby_check_certificates'
+require 'certificate-checker'
 require 'optparse'
 
 options = {
@@ -24,7 +24,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-include RubyCheckCertificates
+include CertificateChecker
 
 report = CertificateReport.new
 

@@ -1,15 +1,14 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
+lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'ruby_check_certificates/version'
+require 'certificate-checker/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'ruby_check_certificates'
-  spec.version       = RubyCheckCertificates::VERSION
+  spec.name          = 'certificate-checker'
+  spec.version       = CertificateChecker::VERSION
   spec.authors       = ['Romain Tartière']
   spec.email         = ['romain@blogreen.org']
   spec.summary       = 'Report expired/about to expires certificates in a directory tree.'
-  spec.homepage      = 'https://github.com/smortex/ruby_check_certificates'
+  spec.homepage      = 'https://github.com/smortex/certificate-checker'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0")

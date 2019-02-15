@@ -29,7 +29,7 @@ RSpec.shared_context 'with an expired certificate' do
   include_context 'with a certificate'
 end
 
-RSpec.describe RubyCheckCertificates::CertificateReport do
+RSpec.describe CertificateChecker::CertificateReport do
   describe '#summary' do
     context 'no certificate' do
       it 'returns correct summary' do

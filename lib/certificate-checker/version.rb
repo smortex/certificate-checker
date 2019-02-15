@@ -1,3 +1,3 @@
-module RubyCheckCertificates
+module CertificateChecker
   VERSION = '0.0.1'.freeze
 end

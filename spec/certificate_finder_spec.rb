@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-RSpec.describe RubyCheckCertificates::CertificateFinder do
+RSpec.describe CertificateChecker::CertificateFinder do
   let(:root) do
     File.expand_path('..', __dir__)
   end

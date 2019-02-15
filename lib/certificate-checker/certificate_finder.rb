@@ -1,4 +1,4 @@
-module RubyCheckCertificates
+module CertificateChecker
   class CertificateFinder
     def initialize(config = {})
       @config = config.merge(ext: ['*.pem', '*.crt'])
