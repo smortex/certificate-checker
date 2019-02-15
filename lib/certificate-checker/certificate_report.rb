@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/duration'
 require 'active_support/core_ext/date/calculations'
@@ -14,23 +16,21 @@ module CertificateChecker
       @now = Time.now.utc
 
       @stop_offsets = {
-        '%d expired %s' => @now,
+        '%d expired %s'                        => @now,
         '%d %s expiring in less than 1 week'   => @now + 1.week,
         '%d %s expiring in less than 2 weeks'  => @now + 2.weeks,
         '%d %s expiring in less than 1 month'  => @now + 1.month,
-        '%d %s expiring in less than 2 months' => @now + 2.months
+        '%d %s expiring in less than 2 months' => @now + 2.months,
       }
     end
 
     def check_certificate(file, line, certificate)
       @checked_certificates += 1
-      if certificate.not_after < @stop_offsets.values.last
-        @certificates << CertificateExpirationInfo.new(file, line, certificate)
-      end
+      @certificates << CertificateExpirationInfo.new(file, line, certificate) if certificate.not_after < @stop_offsets.values.last
     end
 
     def errors?
-      @certificates.count > 0
+      error_count.positive?
     end
 
     def error_count
@@ -50,11 +50,11 @@ module CertificateChecker
     end
 
     def certificate_details(crt)
-      res = <<EOT
+      res = <<REPORT
   * #{crt.file}:#{crt.line}
     subject:   #{crt.subject}
     not_after: #{crt.not_after}
-EOT
+REPORT
       crt.each_extension do |oid, value|
         res += format_extension(oid, value)
       end
@@ -73,7 +73,7 @@ EOT
       res = summary
       @stop_offsets.each do |label, stop|
         crts = @certificates.select { |x| x.expired_between?(last_stop, stop) }
-        res += certificate_group(label, crts) if crts.count > 0
+        res += certificate_group(label, crts) if crts.count.positive?
         last_stop = stop
       end
       res

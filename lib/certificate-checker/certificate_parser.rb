@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openssl'
 
 module CertificateChecker
@@ -23,7 +25,8 @@ module CertificateChecker
       until @f.eof?
         line = @f.readline
         @lineno += 1
-        next unless line =~ /^-----BEGIN CERTIFICATE-----/
+        next unless line.match?(/^-----BEGIN CERTIFICATE-----/)
+
         @data_start_lineno = @lineno
         @data = line
         read_certificate
@@ -35,7 +38,7 @@ module CertificateChecker
         line = @f.readline
         @lineno += 1
         @data += line
-        if line =~ /^-----END CERTIFICATE-----/
+        if line.match?(/^-----END CERTIFICATE-----/)
           add_certificate
           return
         end
@@ -47,7 +50,7 @@ module CertificateChecker
     def add_certificate
       certificates[@data_start_lineno] = OpenSSL::X509::Certificate.new(@data)
     rescue OpenSSL::X509::CertificateError => e
-      $stderr.puts "Error parsing certificate at #{@filename}:#{@data_start_lineno}: #{e.message}"
+      warn "Error parsing certificate at #{@filename}:#{@data_start_lineno}: #{e.message}"
     end
   end
 end

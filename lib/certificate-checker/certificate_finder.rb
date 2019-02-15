@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CertificateChecker
   class CertificateFinder
     def initialize(config = {})
@@ -10,7 +12,7 @@ module CertificateChecker
       elsif File.exist?(path)
         search_file(path)
       else
-        $stderr.puts "No such file or directory @ #{self.class.name}##{__callee__} - #{path}"
+        warn "No such file or directory @ #{self.class.name}##{__callee__} - #{path}"
         []
       end
     end

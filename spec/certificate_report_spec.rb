@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_context 'with a certificate' do
   before do
     certificate = OpenSSL::X509::Certificate.new
