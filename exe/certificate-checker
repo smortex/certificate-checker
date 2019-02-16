@@ -2,30 +2,7 @@
 # frozen_string_literal: true
 
 require 'certificate-checker'
-require 'optparse'
-
-options = {
-  from: "#{`/usr/bin/id -nu`.chomp}@#{`/bin/hostname -f`.chomp}",
-}
-
-OptionParser.new do |opts|
-  opts.banner = 'usage: ruby-check-certificates [options] path...'
-  opts.separator ''
-  opts.separator 'Common options:'
-  opts.on '-v', '--[no-]verbose', 'Run verbosely' do |v|
-    options[:verbose] = v
-  end
-  opts.separator ''
-  opts.separator 'E-mail reporting options:'
-  opts.on '-f', '--from=ADDRESS', 'Send result from ADDRESS' do |from|
-    options[:from] = from
-  end
-  opts.on '-t', '--to=ADDRESS', 'Send result to ADDRESS' do |to|
-    options[:to] = to
-  end
-end.parse!
-
-report = CertificateChecker::CertificateReport.new
+require 'internet_security_event'
 
 ARGV.each do |arg|
   finder = CertificateChecker::CertificateFinder.new
@@ -33,32 +10,14 @@ ARGV.each do |arg|
     begin
       parser = CertificateChecker::CertificateParser.new(file)
       parser.certificates.each do |line, cert|
-        report.check_certificate(file, line, cert)
+        puts InternetSecurityEvent::X509Status.build(cert).merge(
+          service: "#{file}:#{line}",
+          ttl:     12 * 3600,
+          tags:    ['certificate-checker'],
+        )
       end
     rescue Errno::EACCES => e
       warn e.message
     end
-  end
-end
-
-if report.errors? || options[:verbose]
-  if options[:to]
-    require 'net/smtp'
-    hostname = `/bin/hostname -f`.chomp
-    now = Time.now
-    Net::SMTP.start('localhost', 25, hostname) do |smtp|
-      message = <<~MAIL
-        From: #{options[:from]}
-        To: #{options[:to]}
-        Subject: [ruby-check-certificates] #{report.error_count} certificate#{'s' if report.error_count != 1} are about to expire
-        Date: #{now.strftime('%a, %d %b %Y %T %z')}
-        Message-Id: <ruby-check-certificates-#{now.strftime('%s')}@#{hostname}>
-
-        #{report}
-      MAIL
-      smtp.send_message(message, options[:from], options[:to])
-    end
-  else
-    puts report.to_s
   end
 end
