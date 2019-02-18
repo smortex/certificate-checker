@@ -2,22 +2,11 @@
 # frozen_string_literal: true
 
 require 'certificate-checker'
-require 'internet_security_event'
+
+factory = CertificateChecker::CertificateCheckerFactory.new
 
 ARGV.each do |arg|
-  finder = CertificateChecker::CertificateFinder.new
-  finder.search(arg).each do |file|
-    begin
-      parser = CertificateChecker::CertificateParser.new(file)
-      parser.certificates.each do |line, cert|
-        puts InternetSecurityEvent::X509Status.build(cert).merge(
-          service: "#{file}:#{line}",
-          ttl:     12 * 3600,
-          tags:    ['certificate-checker'],
-        )
-      end
-    rescue Errno::EACCES => e
-      warn e.message
-    end
+  factory.certificate_checkers_for(arg).each do |checker|
+    puts checker.to_e
   end
 end
