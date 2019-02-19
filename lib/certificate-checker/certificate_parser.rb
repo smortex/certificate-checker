@@ -25,7 +25,7 @@ module CertificateChecker
       until @f.eof?
         line = @f.readline
         @lineno += 1
-        next unless line.match?(/^-----BEGIN CERTIFICATE-----/)
+        next unless line.match(/^-----BEGIN CERTIFICATE-----/)
 
         @data_start_lineno = @lineno
         @data = line
@@ -38,7 +38,7 @@ module CertificateChecker
         line = @f.readline
         @lineno += 1
         @data += line
-        if line.match?(/^-----END CERTIFICATE-----/)
+        if line.match(/^-----END CERTIFICATE-----/)
           add_certificate
           return
         end

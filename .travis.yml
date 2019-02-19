@@ -1,8 +1,13 @@
 language: ruby
 rvm:
+  - 2.3
   - 2.4
   - 2.5
   - 2.6
+# Remove the whole before_install section when dropping Ruby 2.3 support.
+before_install:
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter
