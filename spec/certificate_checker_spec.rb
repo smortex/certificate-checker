@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe CertificateChecker::CertificateChecker do
-  subject do
-    CertificateChecker::CertificateChecker.new('/var/puppet/ssl/certs/ca.pem', 1, certificate)
-  end
+  let(:checker) { CertificateChecker::CertificateChecker.new('/var/puppet/ssl/certs/ca.pem', 1, certificate) }
 
   let(:certificate) do
     certificate = OpenSSL::X509::Certificate.new
@@ -13,8 +11,8 @@ RSpec.describe CertificateChecker::CertificateChecker do
   end
 
   context '#to_e' do
-    it 'has a proper service' do
-      expect(subject.to_e[:service]).to eq('/var/puppet/ssl/certs/ca.pem:1')
-    end
+    subject { checker.to_e }
+
+    it { is_expected.to include(service: '/var/puppet/ssl/certs/ca.pem:1') }
   end
 end

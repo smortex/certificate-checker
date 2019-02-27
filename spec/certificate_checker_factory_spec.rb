@@ -1,20 +1,30 @@
 # frozen_string_literal: true
 
 RSpec.describe CertificateChecker::CertificateCheckerFactory do
-  let(:root) do
-    File.expand_path('..', __dir__)
-  end
+  let(:factory) { CertificateChecker::CertificateCheckerFactory.new }
+  let(:root) { File.expand_path('..', __dir__) }
 
   context '#certificate_checkers_for' do
-    it 'returns an array of CertificateChecker' do
-      expect(subject.certificate_checkers_for(root)).to be_a(Array)
-      expect(subject.certificate_checkers_for(root).size).to eq(2)
-      expect(subject.certificate_checkers_for(root)[0].file).to eq("#{root}/spec/certificates/cacert.org.crt")
-      expect(subject.certificate_checkers_for(root)[0].line).to eq(1)
-      expect(subject.certificate_checkers_for(root)[0].certificate).to be_a(OpenSSL::X509::Certificate)
-      expect(subject.certificate_checkers_for(root)[1].file).to eq("#{root}/spec/certificates/cacert.org.crt")
-      expect(subject.certificate_checkers_for(root)[1].line).to eq(42)
-      expect(subject.certificate_checkers_for(root)[1].certificate).to be_a(OpenSSL::X509::Certificate)
+    let(:checkers) { factory.certificate_checkers_for(root) }
+    subject { checkers }
+
+    it { is_expected.to be_an(Array) }
+    it { is_expected.to have_attributes(size: 2) }
+
+    context '#[0]' do
+      subject { checkers[0] }
+
+      it { is_expected.to have_attributes(file: "#{root}/spec/certificates/cacert.org.crt") }
+      it { is_expected.to have_attributes(line: 1) }
+      it { is_expected.to have_attributes(certificate: OpenSSL::X509::Certificate) }
+    end
+
+    context '#[1]' do
+      subject { checkers[1] }
+
+      it { is_expected.to have_attributes(file: "#{root}/spec/certificates/cacert.org.crt") }
+      it { is_expected.to have_attributes(line: 42) }
+      it { is_expected.to have_attributes(certificate: OpenSSL::X509::Certificate) }
     end
   end
 end
