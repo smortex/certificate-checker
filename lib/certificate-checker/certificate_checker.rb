@@ -16,6 +16,7 @@ module CertificateChecker
     def to_e
       InternetSecurityEvent::X509Status.build(certificate).merge(
         service: service,
+        line:    line,
         ttl:     3600 * 12,
         tags:    ['certificate-checker'],
       )
@@ -24,7 +25,7 @@ module CertificateChecker
     private
 
     def service
-      "#{file}:#{line}"
+      "#{file}:#{certificate.issuer}:#{certificate.subject}"
     end
   end
 end
