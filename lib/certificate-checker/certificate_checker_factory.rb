@@ -2,8 +2,8 @@
 
 module CertificateChecker
   class CertificateCheckerFactory
-    def initialize
-      @finder = CertificateFinder.new
+    def initialize(config = {})
+      @finder = CertificateFinder.new(config)
     end
 
     def certificate_checkers_for(filename)

@@ -5,8 +5,6 @@ require 'json'
 require 'optparse'
 require 'certificate-checker'
 
-factory = CertificateChecker::CertificateCheckerFactory.new
-
 options = {
   output: $stdout,
 }
@@ -17,7 +15,13 @@ OptionParser.new do |opts|
   opts.on('-o', '--output=FILE', 'Write to FILE') do |f|
     options[:output] = File.open(f, File::CREAT | File::APPEND | File::LOCK_EX)
   end
+
+  opts.on('--[no-]ignore-nonexistent', 'Ignore nonexistent files and arguments') do |v|
+    options[:ignore_nonexistent] = v
+  end
 end.parse!
+
+factory = CertificateChecker::CertificateCheckerFactory.new(options)
 
 ARGV.each do |arg|
   factory.certificate_checkers_for(arg).each do |checker|

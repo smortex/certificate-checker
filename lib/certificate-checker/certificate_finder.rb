@@ -12,7 +12,7 @@ module CertificateChecker
       elsif File.exist?(path)
         search_file(path)
       else
-        warn "No such file or directory @ #{self.class.name}##{__callee__} - #{path}"
+        warn "No such file or directory @ #{self.class.name}##{__callee__} - #{path}" unless @config[:ignore_nonexistent]
         []
       end
     end
