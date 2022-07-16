@@ -3,7 +3,7 @@
 
 require 'json'
 require 'optparse'
-require 'certificate-checker'
+require 'certificate_checker'
 
 options = {
   output: $stdout,

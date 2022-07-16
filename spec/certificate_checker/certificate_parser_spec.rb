@@ -3,9 +3,9 @@
 require 'spec_helper'
 
 RSpec.describe CertificateChecker::CertificateParser do
-  let(:parser) { CertificateChecker::CertificateParser.new(File.expand_path('certificates/cacert.org.crt', __dir__)) }
+  let(:parser) { described_class.new(File.expand_path('certificates/cacert.org.crt', __dir__)) }
 
-  context '#certificates' do
+  describe '#certificates' do
     subject { parser.certificates }
 
     it { is_expected.to have_attributes(count: 2) }

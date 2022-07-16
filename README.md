@@ -1,6 +1,6 @@
 # certificate-checker
 
-[![Build Status](https://travis-ci.com/smortex/certificate-checker.svg?branch=master)](https://travis-ci.com/smortex/certificate-checker)
+[![Build Status](https://github.com/smortex/certificate-checker/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/smortex/certificate-checker/actions/workflows/ci.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/183f536f05771eca87f2/maintainability)](https://codeclimate.com/github/smortex/certificate-checker/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/183f536f05771eca87f2/test_coverage)](https://codeclimate.com/github/smortex/certificate-checker/test_coverage)
 
@@ -54,4 +54,4 @@ License](https://opensource.org/licenses/MIT).
 
 Everyone interacting in the certificate-checker project’s codebases, issue
 trackers, chat rooms and mailing lists is expected to follow the [code of
-conduct](https://github.com/smortex/certificate-checker/blob/master/CODE_OF_CONDUCT.md).
+conduct](https://github.com/smortex/certificate-checker/blob/main/CODE_OF_CONDUCT.md).
