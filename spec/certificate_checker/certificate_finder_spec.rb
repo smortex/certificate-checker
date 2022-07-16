@@ -4,21 +4,21 @@ require 'spec_helper'
 
 RSpec.describe CertificateChecker::CertificateFinder do
   let(:finder) { described_class.new }
-  let(:root) { File.expand_path('../..', __dir__) }
+  let(:spec_dir) { File.expand_path('..', __dir__) }
 
   describe '#search' do
     subject { finder.search(path) }
 
     context 'with an existing directory' do
-      let(:path) { root }
+      let(:path) { spec_dir }
 
-      it { is_expected.to eq(["#{root}/spec/certificate_checker/certificates/cacert.org.crt"]) }
+      it { is_expected.to eq(["#{spec_dir}/certificate_checker/certificates/cacert.org.crt"]) }
     end
 
     context 'with an existing certificate' do
-      let(:path) { "#{root}/spec/certificate_checker/certificates/cacert.org.crt" }
+      let(:path) { "#{spec_dir}/certificate_checker/certificates/cacert.org.crt" }
 
-      it { is_expected.to eq(["#{root}/spec/certificate_checker/certificates/cacert.org.crt"]) }
+      it { is_expected.to eq(["#{spec_dir}/certificate_checker/certificates/cacert.org.crt"]) }
     end
 
     context 'with an non-existing path' do
