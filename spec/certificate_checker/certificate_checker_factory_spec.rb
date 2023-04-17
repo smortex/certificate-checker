@@ -10,7 +10,7 @@ RSpec.describe CertificateChecker::CertificateCheckerFactory do
     let(:checkers) { factory.certificate_checkers_for(spec_dir) }
 
     it { is_expected.to be_an(Array) }
-    it { is_expected.to have_attributes(size: 2) }
+    it { is_expected.to have_attributes(size: 3) }
 
     describe '#[0]' do
       subject { checkers[0] }

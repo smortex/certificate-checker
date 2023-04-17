@@ -12,7 +12,7 @@ RSpec.describe CertificateChecker::CertificateFinder do
     context 'with an existing directory' do
       let(:path) { spec_dir }
 
-      it { is_expected.to eq(["#{spec_dir}/certificate_checker/certificates/cacert.org.crt"]) }
+      it { is_expected.to eq(["#{spec_dir}/certificate_checker/certificates/cacert.org.crt", "#{spec_dir}/certificate_checker/certificates/rfc5280_CRL.crl"]) }
     end
 
     context 'with an existing certificate' do
