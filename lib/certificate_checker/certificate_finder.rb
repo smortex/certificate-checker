@@ -3,7 +3,7 @@
 module CertificateChecker
   class CertificateFinder
     def initialize(config = {})
-      @config = config.merge(ext: ['*.pem', '*.crt'])
+      @config = config.merge(ext: ['*.pem', '*.crt', '*.crl'])
     end
 
     def search(path)
