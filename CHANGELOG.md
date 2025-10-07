@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v3.0.0](https://github.com/smortex/certificate-checker/tree/v3.0.0) (2025-10-07)
+
+[Full Changelog](https://github.com/smortex/certificate-checker/compare/v2.0.1...v3.0.0)
+
+**Breaking changes:**
+
+- Switch to internet\_security\_event 4.x [\#15](https://github.com/smortex/certificate-checker/pull/15) ([smortex](https://github.com/smortex))
+
+**Implemented enhancements:**
+
+- Run CI on Ruby 3.4 [\#16](https://github.com/smortex/certificate-checker/pull/16) ([smortex](https://github.com/smortex))
+
+**Merged pull requests:**
+
+- Bump actions/checkout from 4 to 5 [\#14](https://github.com/smortex/certificate-checker/pull/14) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 6.0.0 to 9.0.0 [\#13](https://github.com/smortex/certificate-checker/pull/13) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 5.0.0 to 6.0.0 [\#11](https://github.com/smortex/certificate-checker/pull/11) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump paambaati/codeclimate-action from 3.0.0 to 5.0.0 [\#9](https://github.com/smortex/certificate-checker/pull/9) ([dependabot[bot]](https://github.com/apps/dependabot))
+
 ## [v2.0.1](https://github.com/smortex/certificate-checker/tree/v2.0.1) (2022-07-16)
 
 [Full Changelog](https://github.com/smortex/certificate-checker/compare/v2.0.0...v2.0.1)
