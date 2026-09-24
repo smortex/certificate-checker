@@ -25,7 +25,9 @@ module CertificateChecker
     private
 
     def service
-      "#{file}:#{certificate.issuer}:#{certificate.subject}"
+      res = "#{file}:#{certificate.issuer}"
+      res += ":#{certificate.subject}" if certificate.is_a?(OpenSSL::X509::Certificate)
+      res
     end
   end
 end
